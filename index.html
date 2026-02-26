@@ -1,0 +1,1617 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ขี้ลืม</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#f5c542">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ขี้ลืม">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<style>
+:root {
+  --bg: #0e0e12;
+  --surface: #18181f;
+  --surface2: #22222c;
+  --accent: #f5c542;
+  --accent2: #e8855a;
+  --text: #e8e6f0;
+  --muted: #7a7890;
+  --border: #2e2e3e;
+  --green: #5bc8af;
+  --radius: 16px;
+  --shadow: 0 8px 32px rgba(0,0,0,0.45);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Noto Sans Thai', 'Sarabun', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: radial-gradient(circle, #ffffff07 1px, transparent 1px);
+  background-size: 28px 28px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.app {
+  position: relative;
+  z-index: 1;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 16px 120px;
+}
+
+/* ── HEADER ── */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+}
+
+.logo {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 26px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+}
+
+.logo small {
+  font-family: 'Noto Sans Thai', sans-serif;
+  font-size: 12px;
+  -webkit-text-fill-color: var(--muted);
+  display: block;
+  font-weight: 300;
+  margin-top: 3px;
+}
+
+/* Settings button */
+.btn-settings {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 18px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+  position: relative;
+}
+.btn-settings:hover { border-color: var(--accent); color: var(--accent); }
+.btn-settings.open { border-color: var(--accent); color: var(--accent); background: var(--surface2); }
+
+/* Settings dropdown */
+.settings-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 8px;
+  min-width: 200px;
+  box-shadow: var(--shadow);
+  z-index: 50;
+  display: none;
+  animation: fadeUp 0.15s ease;
+}
+.settings-menu.open { display: block; }
+
+.settings-header {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 4px 10px 8px;
+}
+
+.settings-divider { height: 1px; background: var(--border); margin: 6px 0; }
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text);
+  transition: background 0.15s;
+  border: none;
+  background: none;
+  width: 100%;
+  font-family: inherit;
+  text-align: left;
+}
+.menu-item:hover { background: var(--surface2); }
+.menu-item .mi-icon { font-size: 16px; width: 22px; text-align: center; }
+.menu-item .mi-label { flex: 1; }
+.menu-item .mi-sub { font-size: 11px; color: var(--muted); display: block; margin-top: 1px; }
+.menu-item.danger:hover { background: rgba(255,107,107,0.1); color: #ff6b6b; }
+
+/* Stats row inside menu */
+.stats-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  padding: 8px;
+}
+.stat-box {
+  background: var(--surface2);
+  border-radius: 10px;
+  padding: 8px 10px;
+  text-align: center;
+}
+.stat-box strong { display: block; font-size: 18px; color: var(--accent); line-height: 1; }
+.stat-box span { font-size: 11px; color: var(--muted); }
+
+/* ── SEARCH ── */
+.search-bar { position: relative; margin-bottom: 18px; }
+.search-bar input {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 13px 16px 13px 44px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.search-bar input:focus { border-color: var(--accent); }
+.search-bar input::placeholder { color: var(--muted); }
+.search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 17px; pointer-events: none; }
+
+/* ── TABS ── */
+.tabs {
+  display: flex;
+  gap: 7px;
+  margin-bottom: 20px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  padding: 7px 16px;
+  border-radius: 30px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.tab.active { background: var(--accent); border-color: var(--accent); color: #000; font-weight: 700; }
+
+/* ── INPUT BOX ── */
+.quick-input {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-bottom: 18px;
+  transition: border-color 0.2s;
+}
+.quick-input:focus-within { border-color: var(--accent); }
+
+.type-selector { display: flex; gap: 7px; margin-bottom: 12px; flex-wrap: wrap; }
+.type-btn {
+  padding: 5px 13px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.type-btn.active { background: var(--surface2); color: var(--text); border-color: var(--accent); }
+
+textarea#noteInput {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 15px;
+  line-height: 1.7;
+  resize: none;
+  outline: none;
+  min-height: 72px;
+}
+textarea#noteInput::placeholder { color: var(--muted); }
+
+.input-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.input-left { display: flex; gap: 7px; align-items: center; }
+
+.tag-input {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 11px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 12px;
+  outline: none;
+  width: 120px;
+}
+.tag-input::placeholder { color: var(--muted); }
+
+.btn-voice {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 7px 13px;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex; align-items: center; gap: 5px;
+  font-family: inherit;
+  font-size: 12px;
+}
+.btn-voice:hover { border-color: var(--accent2); color: var(--accent2); }
+.btn-voice.recording { background: var(--accent2); border-color: var(--accent2); color: #fff; animation: blink 1s infinite; }
+
+.btn-save {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border: none;
+  border-radius: 9px;
+  padding: 8px 20px;
+  color: #000;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.btn-save:hover { opacity: 0.85; }
+
+.rec-indicator { display: none; align-items: center; gap: 7px; color: var(--accent2); font-size: 12px; margin-top: 7px; }
+.rec-indicator.show { display: flex; }
+.rec-dot { width: 7px; height: 7px; background: var(--accent2); border-radius: 50%; animation: blink 1s infinite; }
+
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.65} }
+
+/* ── TEMPLATES (collapsible) ── */
+.tpl-bar { margin-bottom: 22px; }
+
+.tpl-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--muted);
+  cursor: pointer;
+  user-select: none;
+  padding: 4px 0;
+  border: none;
+  background: none;
+  font-family: inherit;
+  transition: color 0.15s;
+  width: 100%;
+  text-align: left;
+}
+.tpl-toggle:hover { color: var(--text); }
+.tpl-toggle .arrow {
+  font-size: 10px;
+  transition: transform 0.2s;
+  margin-left: auto;
+}
+.tpl-toggle.open .arrow { transform: rotate(180deg); }
+.tpl-toggle-label { text-transform: uppercase; letter-spacing: 0.7px; }
+
+.tpl-row {
+  display: none;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 10px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.tpl-row.open { display: flex; }
+.tpl-row::-webkit-scrollbar { display: none; }
+
+.tpl-btn {
+  background: var(--surface);
+  border: 1px dashed var(--border);
+  border-radius: 9px;
+  padding: 7px 13px;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.tpl-btn:hover { border-color: var(--accent); color: var(--text); background: var(--surface2); }
+
+/* ── SECTION HEADER (with sort) ── */
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.section-title {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  white-space: nowrap;
+}
+.section-line { flex: 1; height: 1px; background: var(--border); }
+.sort-select {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 4px 24px 4px 9px;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 11px;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5' viewBox='0 0 8 5'%3E%3Cpath d='M1 1l3 3 3-3' stroke='%237a7890' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-color: var(--surface);
+  transition: border-color 0.2s;
+}
+.sort-select:hover { border-color: var(--accent); color: var(--text); }
+.sort-select option { background: var(--surface2); }
+
+/* ── NOTES GRID ── */
+.notes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 13px;
+  margin-bottom: 10px;
+}
+
+/* ── NOTE CARD ── */
+.note-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  position: relative;
+  transition: transform 0.2s, box-shadow 0.2s;
+  animation: fadeUp 0.25s ease both;
+}
+@keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+.note-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.note-card.type-quick { border-top: 3px solid var(--accent); }
+.note-card.type-todo  { border-top: 3px solid var(--green); }
+.note-card.type-diary { border-top: 3px solid var(--accent2); }
+.note-card.pinned { box-shadow: 0 0 0 1px var(--accent), 0 4px 18px rgba(245,197,66,0.12); }
+.note-card.editing { border-color: var(--accent) !important; box-shadow: 0 0 0 2px rgba(245,197,66,0.15); }
+
+.pin-float { position: absolute; top: -9px; right: 13px; font-size: 15px; }
+
+.card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 9px; }
+.badge { font-size: 10px; padding: 2px 7px; border-radius: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; }
+.badge-quick { background: rgba(245,197,66,0.12); color: var(--accent); }
+.badge-todo  { background: rgba(91,200,175,0.12); color: var(--green); }
+.badge-diary { background: rgba(232,133,90,0.12); color: var(--accent2); }
+.card-date { font-size: 10px; color: var(--muted); }
+
+/* Editable content */
+.note-body {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-word;
+  min-height: 36px;
+  max-height: 130px;
+  overflow-y: auto;
+  border-radius: 7px;
+  padding: 5px 7px;
+  margin: -5px -7px;
+  outline: none;
+  cursor: text;
+  transition: background 0.15s, max-height 0.2s;
+  -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+}
+.note-body:focus {
+  background: var(--surface2);
+  max-height: 360px;
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+.note-body:empty::before { content: 'คลิกเพื่อแก้ไข...'; color: var(--muted); }
+
+.edit-hint { font-size: 10px; color: var(--accent); margin-top: 5px; display: none; }
+.note-card.editing .edit-hint { display: block; }
+
+/* Tags */
+.card-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 10px; }
+.tag { font-size: 10px; padding: 2px 7px; background: var(--surface2); border-radius: 5px; color: var(--muted); cursor: pointer; }
+.tag:hover { color: var(--accent); }
+
+/* Card actions */
+.card-actions { display: flex; align-items: center; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); gap: 4px; }
+.act-btn { background: transparent; border: none; color: var(--muted); cursor: pointer; font-size: 15px; padding: 4px 5px; border-radius: 6px; transition: all 0.15s; }
+.act-btn:hover { color: var(--accent); background: var(--surface2); }
+.act-btn.act-del:hover { color: #ff6b6b; background: rgba(255,107,107,0.1); }
+.act-btn.pinned { color: var(--accent); }
+.act-spacer { flex: 1; }
+
+/* Todo */
+.todo-progress { margin-bottom: 9px; }
+.prog-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+.prog-label { font-size: 11px; color: var(--muted); }
+.prog-count { font-size: 11px; font-weight: 700; color: var(--green); }
+.prog-count.all-done { color: var(--accent); }
+.prog-track { height: 4px; background: var(--surface2); border-radius: 99px; overflow: hidden; }
+.prog-fill { height: 100%; background: linear-gradient(90deg, var(--green), #5bc8af88); border-radius: 99px; transition: width 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+.prog-fill.complete { background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+
+.todo-list { list-style: none; margin-top: 7px; }
+.todo-item { display: flex; align-items: flex-start; gap: 7px; padding: 3px 0; font-size: 13px; line-height: 1.5; }
+.todo-item input[type=checkbox] { accent-color: var(--green); width: 14px; height: 14px; margin-top: 3px; cursor: pointer; flex-shrink: 0; }
+.todo-item.done span { text-decoration: line-through; color: var(--muted); }
+.todo-edit-area {
+  font-size: 11px; color: var(--muted);
+  border-top: 1px dashed var(--border);
+  padding-top: 7px; margin-top: 8px;
+  min-height: 24px;
+  outline: none; cursor: text;
+  white-space: pre-wrap; word-break: break-word;
+}
+.todo-edit-area:focus { color: var(--text); }
+
+/* Empty */
+.empty { text-align: center; padding: 50px 20px; color: var(--muted); grid-column: 1/-1; }
+.empty .emoji { font-size: 48px; margin-bottom: 12px; }
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 28px; left: 50%;
+  transform: translateX(-50%) translateY(16px);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 11px 16px;
+  font-size: 13px;
+  color: var(--text);
+  opacity: 0;
+  transition: all 0.25s;
+  z-index: 500;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  white-space: nowrap;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+
+.toast-undo {
+  background: var(--accent);
+  border: none;
+  border-radius: 7px;
+  padding: 4px 12px;
+  color: #000;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.toast-undo:hover { opacity: 0.85; }
+
+/* ── COLOR PICKER ── */
+.color-picker {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px;
+  gap: 7px;
+  flex-wrap: wrap;
+  width: 168px;
+  box-shadow: var(--shadow);
+  z-index: 50;
+  animation: fadeUp 0.15s ease;
+}
+.color-picker.open { display: flex; }
+.color-dot {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: transform 0.15s, border-color 0.15s;
+  flex-shrink: 0;
+}
+.color-dot:hover { transform: scale(1.2); }
+.color-dot.active { border-color: #fff; }
+
+/* ── FULLSCREEN MODE ── */
+.fullscreen-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: #0a0a0f;
+  z-index: 600;
+  flex-direction: column;
+}
+.fullscreen-overlay.open { display: flex; }
+
+.fs-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.fs-title {
+  font-size: 13px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.fs-wordcount { font-size: 12px; color: var(--muted); }
+.btn-fs-close {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 6px 14px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-fs-close:hover { border-color: var(--accent); color: var(--accent); }
+
+.fs-body {
+  flex: 1;
+  padding: 32px;
+  overflow-y: auto;
+  max-width: 720px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.fs-textarea {
+  width: 100%;
+  height: 100%;
+  min-height: calc(100vh - 130px);
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 17px;
+  line-height: 1.9;
+  resize: none;
+  caret-color: var(--accent);
+}
+.fs-textarea::placeholder { color: var(--muted); }
+.drop-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(14,14,18,0.88);
+  z-index: 400;
+  align-items: center; justify-content: center;
+  flex-direction: column; gap: 14px;
+  border: 3px dashed var(--accent);
+}
+.drop-overlay.show { display: flex; }
+.drop-overlay .di { font-size: 60px; }
+.drop-overlay p { font-size: 18px; color: var(--accent); font-weight: 700; }
+.drop-overlay small { color: var(--muted); font-size: 13px; }
+
+/* ── DAILY RECAP ── */
+.recap-card {
+  background: linear-gradient(135deg, rgba(245,197,66,0.07), rgba(232,133,90,0.07));
+  border: 1px solid rgba(245,197,66,0.25);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  margin-bottom: 20px;
+  animation: fadeUp 0.3s ease both;
+  position: relative;
+}
+.recap-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.recap-close {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 0 2px;
+  line-height: 1;
+  transition: color 0.15s;
+}
+.recap-close:hover { color: var(--text); }
+.recap-items { display: flex; flex-direction: column; gap: 6px; }
+.recap-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.5;
+}
+.recap-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+.recap-item b { color: var(--accent); }
+.recap-item.good { color: var(--green); }
+.recap-nothing { font-size: 13px; color: var(--muted); }
+
+/* ── QUICK CAPTURE FLOATING BUTTON ── */
+.fab {
+  position: fixed;
+  bottom: 28px;
+  right: 24px;
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border: none;
+  color: #000;
+  font-size: 22px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(245,197,66,0.4);
+  z-index: 100;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.fab:hover { transform: scale(1.1); box-shadow: 0 6px 28px rgba(245,197,66,0.55); }
+.fab.open { transform: rotate(45deg); }
+
+/* Quick capture popup */
+.qc-popup {
+  position: fixed;
+  bottom: 92px;
+  right: 24px;
+  width: min(340px, calc(100vw - 32px));
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: var(--shadow);
+  z-index: 100;
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+  animation: slideUp 0.2s ease;
+}
+.qc-popup.open { display: flex; }
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.qc-header {
+  font-size: 12px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.qc-types { display: flex; gap: 5px; }
+.qc-type-btn {
+  padding: 3px 10px;
+  border-radius: 15px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.qc-type-btn.active { background: var(--surface2); color: var(--text); border-color: var(--accent); }
+
+.qc-textarea {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.6;
+  resize: none;
+  outline: none;
+  min-height: 80px;
+  transition: border-color 0.15s;
+}
+.qc-textarea:focus { border-color: var(--accent); }
+.qc-textarea::placeholder { color: var(--muted); }
+
+.qc-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.qc-hint { font-size: 11px; color: var(--muted); }
+.qc-save {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border: none;
+  border-radius: 8px;
+  padding: 7px 18px;
+  color: #000;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.qc-save:hover { opacity: 0.85; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo">
+      ขี้ลืม
+      <small>โน้ตสำหรับคนขี้เกียจ 🧠</small>
+    </div>
+    <div style="position:relative">
+      <button class="btn-settings" id="settingsBtn" onclick="toggleSettings()">⚙️</button>
+      <div class="settings-menu" id="settingsMenu">
+        <div class="settings-header">ข้อมูล</div>
+        <div class="stats-row">
+          <div class="stat-box"><strong id="statTotal">0</strong><span>ทั้งหมด</span></div>
+          <div class="stat-box"><strong id="statPinned">0</strong><span>📌 ปักหมุด</span></div>
+          <div class="stat-box"><strong id="statTodo">0</strong><span>✅ To-do</span></div>
+          <div class="stat-box"><strong id="statDiary">0</strong><span>📖 ไดอารี่</span></div>
+        </div>
+        <div class="settings-divider"></div>
+        <div class="settings-header">Backup</div>
+        <button class="menu-item" onclick="exportBackup(); closeSettings()">
+          <span class="mi-icon">💾</span>
+          <span class="mi-label">Export<small class="mi-sub">ดาวน์โหลดโน้ตเป็นไฟล์ .json</small></span>
+        </button>
+        <button class="menu-item" onclick="document.getElementById('importFile').click(); closeSettings()">
+          <span class="mi-icon">📂</span>
+          <span class="mi-label">Import<small class="mi-sub">นำเข้าจากไฟล์ หรือลากมาวาง</small></span>
+        </button>
+        <input type="file" id="importFile" accept=".json" style="display:none" onchange="importBackup(event)">
+      </div>
+    </div>
+  </header>
+
+  <!-- DAILY RECAP -->
+  <div id="recapCard" style="display:none"></div>
+
+  <!-- SEARCH -->
+  <div class="search-bar">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="searchInput" placeholder="ค้นหาโน้ต...">
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" data-filter="all">ทั้งหมด</button>
+    <button class="tab" data-filter="pinned">📌 ปักหมุด</button>
+    <button class="tab" data-filter="quick">📝 โน้ต</button>
+    <button class="tab" data-filter="todo">✅ To-do</button>
+    <button class="tab" data-filter="diary">📖 ไดอารี่</button>
+  </div>
+
+  <!-- INPUT -->
+  <div class="quick-input">
+    <div class="type-selector">
+      <button class="type-btn active" data-type="quick">📝 โน้ตสั้น</button>
+      <button class="type-btn" data-type="todo">✅ To-do</button>
+      <button class="type-btn" data-type="diary">📖 ไดอารี่</button>
+    </div>
+    <textarea id="noteInput" placeholder="พิมพ์อะไรก็ได้... กด Ctrl+Enter เพื่อบันทึก" rows="3"></textarea>
+    <div class="rec-indicator" id="recIndicator"><span class="rec-dot"></span> กำลังฟัง...</div>
+    <div class="input-bottom">
+      <div class="input-left">
+        <button class="btn-voice" id="voiceBtn">🎤 เสียง</button>
+        <input type="text" class="tag-input" id="tagInput" placeholder="แท็ก (คั่นด้วย ,)">
+      </div>
+      <button class="btn-save" onclick="saveNote()">บันทึก</button>
+    </div>
+  </div>
+
+  <!-- TEMPLATES (collapsible) -->
+  <div class="tpl-bar">
+    <button class="tpl-toggle" id="tplToggle" onclick="toggleTemplates()">
+      <span class="tpl-toggle-label">⚡ Template</span>
+      <span class="arrow">▼</span>
+    </button>
+    <div class="tpl-row" id="tplRow"></div>
+  </div>
+
+  <!-- PINNED -->
+  <div id="pinnedSection" style="display:none">
+    <div class="section-header">
+      <span class="section-title">📌 ปักหมุด</span>
+      <span class="section-line"></span>
+    </div>
+    <div class="notes-grid" id="pinnedList"></div>
+    <div style="margin-bottom:20px"></div>
+  </div>
+
+  <!-- NOTES -->
+  <div id="mainSection" style="display:none">
+    <div class="section-header">
+      <span class="section-title" id="sectionTitle">โน้ตทั้งหมด</span>
+      <span class="section-line"></span>
+      <select class="sort-select" id="sortSelect" onchange="currentSort=this.value; renderNotes()">
+        <option value="newest">🕐 ล่าสุด</option>
+        <option value="oldest">🕰️ เก่าสุด</option>
+        <option value="type">📂 ประเภท</option>
+        <option value="todo-progress">📊 คืบหน้า</option>
+      </select>
+    </div>
+    <div class="notes-grid" id="notesList"></div>
+  </div>
+
+  <div class="notes-grid" id="emptyState" style="display:none">
+    <div class="empty">
+      <div class="emoji">🌙</div>
+      <p id="emptyMsg">ยังไม่มีโน้ต เริ่มพิมพ์ด้านบนได้เลย!</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- QUICK CAPTURE -->
+<button class="fab" id="fab" onclick="toggleQC()" title="จดโน้ตด่วน">✏️</button>
+<div class="qc-popup" id="qcPopup">
+  <div class="qc-header">
+    <div class="qc-types">
+      <button class="qc-type-btn active" data-type="quick">📝</button>
+      <button class="qc-type-btn" data-type="todo">✅</button>
+      <button class="qc-type-btn" data-type="diary">📖</button>
+    </div>
+    <span>Enter = บันทึก</span>
+  </div>
+  <textarea class="qc-textarea" id="qcTextarea" placeholder="พิมพ์อะไรก็ได้..." rows="3"></textarea>
+  <div class="qc-footer">
+    <span class="qc-hint">Shift+Enter = ขึ้นบรรทัดใหม่</span>
+    <button class="qc-save" onclick="saveQC()">บันทึก</button>
+  </div>
+</div>
+<div class="fullscreen-overlay" id="fsOverlay">
+  <div class="fs-header">
+    <div class="fs-title">
+      <span id="fsTypeLabel">📖 ไดอารี่</span>
+      <span id="fsDate" style="color:var(--muted);font-size:11px"></span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span class="fs-wordcount" id="fsWordCount">0 คำ</span>
+      <button class="btn-fs-close" onclick="closeFullscreen()">✕ ปิด</button>
+    </div>
+  </div>
+  <div class="fs-body">
+    <textarea class="fs-textarea" id="fsTextarea" placeholder="เริ่มเขียนได้เลย..." oninput="updateFsWordCount()"></textarea>
+  </div>
+</div>
+
+<!-- Drop overlay -->
+<div class="drop-overlay" id="dropOverlay">
+  <div class="di">📂</div>
+  <p>วางไฟล์ backup ที่นี่</p>
+  <small>ไฟล์ .json จาก Export เท่านั้น</small>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let notes = JSON.parse(localStorage.getItem('kheeleum_notes') || '[]');
+let currentType = 'quick';
+let currentFilter = 'all';
+let currentSort = 'newest';
+let searchQuery = '';
+let recognition = null;
+let isRecording = false;
+
+// ── SETTINGS MENU ──
+function toggleSettings() {
+  const btn = document.getElementById('settingsBtn');
+  const menu = document.getElementById('settingsMenu');
+  btn.classList.toggle('open');
+  menu.classList.toggle('open');
+}
+function closeSettings() {
+  document.getElementById('settingsBtn').classList.remove('open');
+  document.getElementById('settingsMenu').classList.remove('open');
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('#settingsBtn') && !e.target.closest('#settingsMenu')) closeSettings();
+});
+
+// ── TEMPLATES ──
+const TEMPLATES = [
+  { icon: '🛒', label: 'ของที่ต้องซื้อ',   type: 'todo',  content: 'นม\nไข่\nข้าวสาร\nผักสด\nน้ำดื่ม' },
+  { icon: '📅', label: 'ต้องทำวันนี้',      type: 'todo',  content: 'เช็คอีเมล\nประชุม\nออกกำลังกาย' },
+  { icon: '📖', label: 'บันทึกวันนี้',       type: 'diary', content: () => `วันนี้ ${new Date().toLocaleDateString('th-TH',{weekday:'long',day:'numeric',month:'long'})}\n\nวันนี้ทำอะไร:\n\nรู้สึกยังไง:\n\nพรุ่งนี้ต้องทำ:` },
+  { icon: '💡', label: 'ไอเดีย',             type: 'quick', content: 'ไอเดีย: \n\nทำไมมันดี:\n\nขั้นตอนต่อไป:' },
+  { icon: '🎯', label: 'เป้าหมายสัปดาห์',   type: 'todo',  content: 'อ่านหนังสือ 30 นาที/วัน\nดื่มน้ำ 8 แก้ว/วัน\nนอนก่อน 23:00\nออกกำลังกาย 3 ครั้ง' },
+  { icon: '💊', label: 'ยา/วิตามิน',         type: 'todo',  content: 'เช้า: \nกลางวัน: \nเย็น: \nก่อนนอน: ' },
+  { icon: '✈️', label: 'แพ็คกระเป๋า',        type: 'todo',  content: 'เสื้อผ้า\nยาสีฟัน/แปรงสีฟัน\nชาร์จเจอร์\nหนังสือเดินทาง\nกระเป๋าสตางค์\nหูฟัง' },
+  { icon: '🍽️', label: 'เมนูสัปดาห์',       type: 'quick', content: 'จันทร์: \nอังคาร: \nพุธ: \nพฤหัส: \nศุกร์: \nเสาร์: \nอาทิตย์: ' },
+];
+
+function renderTemplates() {
+  document.getElementById('tplRow').innerHTML = TEMPLATES.map((t, i) =>
+    `<button class="tpl-btn" onclick="useTemplate(${i})">${t.icon} ${t.label}</button>`
+  ).join('');
+}
+
+function toggleTemplates() {
+  document.getElementById('tplToggle').classList.toggle('open');
+  document.getElementById('tplRow').classList.toggle('open');
+}
+
+function useTemplate(i) {
+  const tpl = TEMPLATES[i];
+  document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.type-btn[data-type="${tpl.type}"]`).classList.add('active');
+  currentType = tpl.type;
+  const content = typeof tpl.content === 'function' ? tpl.content() : tpl.content;
+  document.getElementById('noteInput').value = content;
+  document.getElementById('noteInput').focus();
+  // Auto-close template panel
+  document.getElementById('tplToggle').classList.remove('open');
+  document.getElementById('tplRow').classList.remove('open');
+  showToast(`โหลด "${tpl.label}" แล้ว ✨`);
+}
+
+// ── TOAST ──
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.innerHTML = `<span>${msg}</span>`;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+function showToastUndo(onUndo) {
+  const t = document.getElementById('toast');
+  t.innerHTML = `<span>ลบแล้ว 🗑️</span><button class="toast-undo" onclick="(${onUndo.toString()})(); document.getElementById('toast').classList.remove('show')">เลิกทำ</button>`;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), 5000);
+}
+
+// ── TYPE SELECTOR ──
+document.querySelectorAll('.type-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentType = btn.dataset.type;
+    const ph = { todo: 'พิมพ์แต่ละ task แยกบรรทัด...', diary: 'วันนี้เป็นยังไงบ้าง...', quick: 'พิมพ์อะไรก็ได้... กด Ctrl+Enter เพื่อบันทึก' };
+    document.getElementById('noteInput').placeholder = ph[currentType];
+  });
+});
+
+// ── TABS ──
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    currentFilter = tab.dataset.filter;
+    renderNotes();
+  });
+});
+
+// ── SEARCH ──
+document.getElementById('searchInput').addEventListener('input', e => {
+  searchQuery = e.target.value.toLowerCase();
+  renderNotes();
+});
+
+// ── KEYBOARD ──
+document.getElementById('noteInput').addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); saveNote(); }
+});
+
+// ── SAVE ──
+function saveNote() {
+  const text = document.getElementById('noteInput').value.trim();
+  if (!text) return;
+  const tagRaw = document.getElementById('tagInput').value.trim();
+  const tags = tagRaw ? tagRaw.split(',').map(t => t.trim()).filter(Boolean) : [];
+  const note = { id: Date.now(), type: currentType, content: text, tags, created: new Date().toISOString(), pinned: false, todoStates: {} };
+  if (currentType === 'todo') text.split('\n').filter(l => l.trim()).forEach((_, i) => note.todoStates[i] = false);
+  notes.unshift(note);
+  persist();
+  renderNotes();
+  document.getElementById('noteInput').value = '';
+  document.getElementById('tagInput').value = '';
+  document.getElementById('noteInput').focus();
+  showToast('บันทึกแล้ว ✓');
+}
+
+function persist() { localStorage.setItem('kheeleum_notes', JSON.stringify(notes)); }
+
+// ── INLINE EDIT ──
+function saveInlineEdit(id, el, isTodoArea) {
+  const note = notes.find(n => n.id === id);
+  if (!note) return;
+  const newContent = el.innerText.trim();
+  if (!newContent || newContent === note.content) return;
+  note.content = newContent;
+  if (note.type === 'todo') {
+    const lines = newContent.split('\n').filter(l => l.trim());
+    const old = { ...note.todoStates };
+    note.todoStates = {};
+    lines.forEach((_, i) => note.todoStates[i] = old[i] || false);
+    renderNotes();
+  }
+  persist();
+  showToast('บันทึกการแก้ไขแล้ว ✓');
+}
+
+// ── PIN ──
+function togglePin(id) {
+  const note = notes.find(n => n.id === id);
+  if (!note) return;
+  note.pinned = !note.pinned;
+  persist();
+  renderNotes();
+  showToast(note.pinned ? '📌 ปักหมุดแล้ว!' : 'เอาหมุดออกแล้ว');
+}
+
+// ── DELETE WITH UNDO ──
+let pendingDelete = null;
+
+function deleteNote(id) {
+  const note = notes.find(n => n.id === id);
+  if (!note) return;
+
+  // Dim card immediately
+  const card = document.querySelector(`[data-note-id="${id}"]`);
+  if (card) { card.style.opacity = '0.25'; card.style.pointerEvents = 'none'; card.style.transition = 'opacity 0.2s'; }
+
+  // Cancel previous pending delete if any (actually delete it now)
+  if (pendingDelete) {
+    notes = notes.filter(n => n.id !== pendingDelete.id);
+    clearTimeout(pendingDelete.timer);
+  }
+
+  pendingDelete = { id };
+  pendingDelete.timer = setTimeout(() => {
+    notes = notes.filter(n => n.id !== id);
+    persist();
+    renderNotes();
+    pendingDelete = null;
+  }, 5000);
+
+  showToastUndo(() => undoDelete(id));
+}
+
+function undoDelete(id) {
+  if (!pendingDelete || pendingDelete.id !== id) return;
+  clearTimeout(pendingDelete.timer);
+  pendingDelete = null;
+  const card = document.querySelector(`[data-note-id="${id}"]`);
+  if (card) { card.style.opacity = '1'; card.style.pointerEvents = ''; }
+  showToast('คืนโน้ตแล้ว ↩️');
+}
+
+// ── TODO TOGGLE ──
+function toggleTodo(noteId, idx) {
+  const note = notes.find(n => n.id === noteId);
+  if (!note) return;
+  note.todoStates[idx] = !note.todoStates[idx];
+  persist();
+  const card = document.querySelector(`[data-note-id="${noteId}"]`);
+  if (!card) return;
+  card.querySelectorAll('.todo-item')[idx]?.classList.toggle('done', note.todoStates[idx]);
+  const lines = note.content.split('\n').filter(l => l.trim());
+  const total = lines.length;
+  const done = lines.filter((_, i) => note.todoStates[i]).length;
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+  const allDone = done === total && total > 0;
+  const fill = card.querySelector('.prog-fill');
+  const count = card.querySelector('.prog-count');
+  const lbl = card.querySelector('.prog-label');
+  if (fill) { fill.style.width = pct + '%'; fill.classList.toggle('complete', allDone); }
+  if (count) { count.textContent = `${done}/${total}`; count.classList.toggle('all-done', allDone); }
+  if (lbl) lbl.textContent = allDone ? '🎉 เสร็จหมดแล้ว!' : 'ความคืบหน้า';
+  if (allDone) showToast('🎉 ทำครบทุกข้อแล้ว!');
+}
+
+function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function fmtDate(iso) {
+  return new Date(iso).toLocaleDateString('th-TH', { day:'numeric', month:'short', year:'2-digit', hour:'2-digit', minute:'2-digit' });
+}
+
+function buildCard(note) {
+  const bc = { quick:'badge-quick', todo:'badge-todo', diary:'badge-diary' }[note.type];
+  const bl = { quick:'📝 โน้ต', todo:'✅ To-do', diary:'📖 ไดอารี่' }[note.type];
+  let body = '';
+
+  if (note.type === 'todo') {
+    const lines = note.content.split('\n').filter(l => l.trim());
+    const total = lines.length;
+    const done = lines.filter((_,i) => note.todoStates[i]).length;
+    const pct = total > 0 ? Math.round((done/total)*100) : 0;
+    const allDone = done === total && total > 0;
+    body = `
+      <div class="todo-progress">
+        <div class="prog-head">
+          <span class="prog-label">${allDone ? '🎉 เสร็จหมดแล้ว!' : 'ความคืบหน้า'}</span>
+          <span class="prog-count ${allDone?'all-done':''}">${done}/${total}</span>
+        </div>
+        <div class="prog-track"><div class="prog-fill ${allDone?'complete':''}" style="width:${pct}%"></div></div>
+      </div>
+      <ul class="todo-list">${lines.map((line,i) => `
+        <li class="todo-item ${note.todoStates[i]?'done':''}">
+          <input type="checkbox" ${note.todoStates[i]?'checked':''} onchange="toggleTodo(${note.id},${i})">
+          <span>${esc(line)}</span>
+        </li>`).join('')}</ul>
+      <div class="todo-edit-area" contenteditable="true"
+        onblur="saveInlineEdit(${note.id},this,true); this.closest('.note-card').classList.remove('editing')"
+        onfocus="this.closest('.note-card').classList.add('editing')"
+        title="แก้ไขรายการ">${esc(note.content)}</div>
+      <div class="edit-hint">✏️ กำลังแก้ไข — คลิกออกเพื่อบันทึก</div>`;
+  } else {
+    body = `
+      <div class="note-body" contenteditable="true"
+        onblur="saveInlineEdit(${note.id},this,false); this.closest('.note-card').classList.remove('editing')"
+        onfocus="this.closest('.note-card').classList.add('editing')"
+      >${esc(note.content)}</div>
+      <div class="edit-hint">✏️ กำลังแก้ไข — คลิกออกเพื่อบันทึก</div>`;
+  }
+
+  const defaultColors = { quick: 'var(--accent)', todo: 'var(--green)', diary: 'var(--accent2)' };
+  const topColor = note.color || defaultColors[note.type];
+
+  const tagsHtml = note.tags.length
+    ? `<div class="card-tags">${note.tags.map(t=>`<span class="tag" onclick="filterTag('${t}')">#${t}</span>`).join('')}</div>` : '';
+
+  const fsBtn = (note.type === 'diary' || note.type === 'quick')
+    ? `<button class="act-btn" onclick="openFullscreen(${note.id})" title="โหมดเขียนเต็มจอ">⛶</button>` : '';
+
+  return `<div class="note-card type-${note.type} ${note.pinned?'pinned':''}" data-note-id="${note.id}" style="border-top-color:${topColor}">
+    ${note.pinned ? '<span class="pin-float">📌</span>' : ''}
+    <div class="card-header">
+      <span class="badge ${bc}">${bl}</span>
+      <span class="card-date">${fmtDate(note.created)}</span>
+    </div>
+    ${body}
+    ${tagsHtml}
+    <div class="card-actions" style="position:relative">
+      <button class="act-btn ${note.pinned?'pinned':''}" onclick="togglePin(${note.id})" title="${note.pinned?'เอาหมุดออก':'ปักหมุด'}">${note.pinned?'📌':'📍'}</button>
+      <button class="act-btn" onclick="toggleColorPicker(${note.id}, this)" title="เปลี่ยนสี">🎨</button>
+      <div class="color-picker" id="cp-${note.id}">
+        ${['#f5c542','#e8855a','#5bc8af','#7c9ef5','#c97be8','#ff6b6b','#64d2a0','#aaaaaa'].map(c=>
+          `<span class="color-dot ${(note.color||defaultColors[note.type])===c?'active':''}" style="background:${c}" onclick="setNoteColor(${note.id},'${c}',this)"></span>`
+        ).join('')}
+        <span class="color-dot active" style="background:linear-gradient(135deg,#f5c542,#e8855a,#5bc8af);border:2px dashed var(--muted)" onclick="setNoteColor(${note.id},null,this)" title="ค่าเริ่มต้น"></span>
+      </div>
+      <span class="act-spacer"></span>
+      ${fsBtn}
+      <button class="act-btn act-del" onclick="deleteNote(${note.id})" title="ลบ">🗑️</button>
+    </div>
+  </div>`;
+}
+
+// ── RENDER ──
+function renderNotes() {
+  let filtered = [...notes];
+  if (currentFilter === 'pinned') filtered = filtered.filter(n => n.pinned);
+  else if (currentFilter !== 'all') filtered = filtered.filter(n => n.type === currentFilter);
+  if (searchQuery) filtered = filtered.filter(n =>
+    n.content.toLowerCase().includes(searchQuery) || n.tags.some(t => t.toLowerCase().includes(searchQuery))
+  );
+
+  // Sort
+  filtered.sort((a,b) => {
+    if (currentSort === 'oldest') return new Date(a.created) - new Date(b.created);
+    if (currentSort === 'type') return a.type.localeCompare(b.type);
+    if (currentSort === 'todo-progress') {
+      const p = n => { if(n.type!=='todo') return -1; const ls=n.content.split('\n').filter(l=>l.trim()); return ls.length>0?ls.filter((_,i)=>n.todoStates[i]).length/ls.length:0; };
+      return p(b)-p(a);
+    }
+    return new Date(b.created) - new Date(a.created);
+  });
+
+  // Stats
+  document.getElementById('statTotal').textContent = notes.length;
+  document.getElementById('statPinned').textContent = notes.filter(n=>n.pinned).length;
+  document.getElementById('statTodo').textContent = notes.filter(n=>n.type==='todo').length;
+  document.getElementById('statDiary').textContent = notes.filter(n=>n.type==='diary').length;
+
+  const pinned = filtered.filter(n => n.pinned);
+  const others = filtered.filter(n => !n.pinned);
+  const showPinSep = pinned.length > 0 && currentFilter !== 'pinned';
+
+  const pinnedSection = document.getElementById('pinnedSection');
+  const pinnedList = document.getElementById('pinnedList');
+  const mainSection = document.getElementById('mainSection');
+  const notesList = document.getElementById('notesList');
+  const emptyState = document.getElementById('emptyState');
+  const sectionTitle = document.getElementById('sectionTitle');
+
+  const filterLabels = { all:'โน้ตทั้งหมด', pinned:'ปักหมุด', quick:'โน้ตสั้น', todo:'To-do List', diary:'บันทึกไดอารี่' };
+  if (sectionTitle) sectionTitle.textContent = filterLabels[currentFilter] || 'โน้ตทั้งหมด';
+
+  if (showPinSep) {
+    pinnedSection.style.display = 'block';
+    pinnedList.innerHTML = pinned.map(buildCard).join('');
+    if (others.length > 0) {
+      mainSection.style.display = 'block';
+      notesList.innerHTML = others.map(buildCard).join('');
+      emptyState.style.display = 'none';
+    } else {
+      mainSection.style.display = 'none';
+      emptyState.style.display = 'none';
+    }
+  } else {
+    pinnedSection.style.display = 'none';
+    if (filtered.length === 0) {
+      mainSection.style.display = 'none';
+      emptyState.style.display = 'grid';
+      document.getElementById('emptyMsg').textContent = searchQuery ? 'ไม่พบโน้ตที่ค้นหา' : currentFilter === 'pinned' ? 'ยังไม่มีโน้ตที่ปักหมุด' : 'ยังไม่มีโน้ต เริ่มพิมพ์ด้านบนได้เลย!';
+    } else {
+      mainSection.style.display = 'block';
+      notesList.innerHTML = filtered.map(buildCard).join('');
+      emptyState.style.display = 'none';
+    }
+  }
+}
+
+function filterTag(tag) {
+  document.getElementById('searchInput').value = tag;
+  searchQuery = tag.toLowerCase();
+  renderNotes();
+}
+
+// ── VOICE ──
+function setupVoice() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { document.getElementById('voiceBtn').style.opacity = '0.4'; return; }
+  recognition = new SR();
+  recognition.lang = 'th-TH';
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  let final = '';
+  recognition.onresult = e => {
+    let interim = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) final += e.results[i][0].transcript;
+      else interim = e.results[i][0].transcript;
+    }
+    document.getElementById('noteInput').value = final + interim;
+  };
+  recognition.onend = () => {
+    isRecording = false;
+    document.getElementById('voiceBtn').classList.remove('recording');
+    document.getElementById('recIndicator').classList.remove('show');
+  };
+  document.getElementById('voiceBtn').addEventListener('click', () => {
+    if (!isRecording) {
+      final = document.getElementById('noteInput').value;
+      recognition.start();
+      isRecording = true;
+      document.getElementById('voiceBtn').classList.add('recording');
+      document.getElementById('recIndicator').classList.add('show');
+    } else { recognition.stop(); }
+  });
+}
+
+// ── EXPORT ──
+function exportBackup() {
+  const blob = new Blob([JSON.stringify({ version:1, exported:new Date().toISOString(), notes }, null, 2)], { type:'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `kheeleum-${new Date().toLocaleDateString('th-TH').replace(/\//g,'-')}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast(`💾 Export แล้ว ${notes.length} โน้ต`);
+}
+
+// ── IMPORT ──
+function importBackup(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      const imported = data.notes || data;
+      if (!Array.isArray(imported)) throw new Error();
+      const ids = new Set(notes.map(n => n.id));
+      const newNotes = imported.filter(n => !ids.has(n.id));
+      notes = [...newNotes, ...notes];
+      persist(); renderNotes();
+      showToast(`📂 Import สำเร็จ! เพิ่ม ${newNotes.length} โน้ต`);
+    } catch { showToast('❌ ไฟล์ไม่ถูกต้อง'); }
+    event.target.value = '';
+  };
+  reader.readAsText(file);
+}
+
+// ── DRAG & DROP ──
+const dropOverlay = document.getElementById('dropOverlay');
+let dragN = 0;
+document.addEventListener('dragenter', e => { if (e.dataTransfer.types.includes('Files')) { dragN++; dropOverlay.classList.add('show'); } });
+document.addEventListener('dragleave', () => { if (--dragN <= 0) { dragN=0; dropOverlay.classList.remove('show'); } });
+document.addEventListener('dragover', e => e.preventDefault());
+document.addEventListener('drop', e => {
+  e.preventDefault(); dragN=0; dropOverlay.classList.remove('show');
+  const file = e.dataTransfer.files[0];
+  if (!file?.name.endsWith('.json')) { showToast('❌ กรุณาวางไฟล์ .json เท่านั้น'); return; }
+  importBackup({ target: { files:[file], value:'' } });
+});
+
+// ── COLOR PICKER ──
+function toggleColorPicker(id, btn) {
+  const cp = document.getElementById(`cp-${id}`);
+  if (!cp) return;
+  // Close all others
+  document.querySelectorAll('.color-picker.open').forEach(el => { if (el !== cp) el.classList.remove('open'); });
+  cp.classList.toggle('open');
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.act-btn') && !e.target.closest('.color-picker')) {
+    document.querySelectorAll('.color-picker.open').forEach(el => el.classList.remove('open'));
+  }
+});
+
+function setNoteColor(id, color, dot) {
+  const note = notes.find(n => n.id === id);
+  if (!note) return;
+  note.color = color;
+  persist();
+  // Update card border instantly
+  const card = document.querySelector(`[data-note-id="${id}"]`);
+  if (card) {
+    const defaultColors = { quick: 'var(--accent)', todo: 'var(--green)', diary: 'var(--accent2)' };
+    card.style.borderTopColor = color || defaultColors[note.type];
+  }
+  // Update active dot
+  dot.closest('.color-picker').querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+  dot.classList.add('active');
+  document.getElementById(`cp-${id}`)?.classList.remove('open');
+  showToast('เปลี่ยนสีแล้ว 🎨');
+}
+
+// ── FULLSCREEN ──
+let fsNoteId = null;
+
+function openFullscreen(id) {
+  const note = notes.find(n => n.id === id);
+  if (!note) return;
+  fsNoteId = id;
+  const overlay = document.getElementById('fsOverlay');
+  const textarea = document.getElementById('fsTextarea');
+  const typeLabel = document.getElementById('fsTypeLabel');
+  const fsDate = document.getElementById('fsDate');
+  const labels = { quick: '📝 โน้ต', diary: '📖 ไดอารี่' };
+  typeLabel.textContent = labels[note.type] || '📝 โน้ต';
+  fsDate.textContent = fmtDate(note.created);
+  textarea.value = note.content;
+  overlay.classList.add('open');
+  textarea.focus();
+  updateFsWordCount();
+}
+
+function closeFullscreen() {
+  const overlay = document.getElementById('fsOverlay');
+  const textarea = document.getElementById('fsTextarea');
+  if (fsNoteId !== null) {
+    const note = notes.find(n => n.id === fsNoteId);
+    if (note && textarea.value.trim() && textarea.value.trim() !== note.content) {
+      note.content = textarea.value.trim();
+      persist();
+      renderNotes();
+      showToast('บันทึกแล้ว ✓');
+    }
+  }
+  overlay.classList.remove('open');
+  fsNoteId = null;
+}
+
+function updateFsWordCount() {
+  const text = document.getElementById('fsTextarea').value.trim();
+  const words = text ? text.split(/\s+/).length : 0;
+  document.getElementById('fsWordCount').textContent = `${words} คำ`;
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && document.getElementById('fsOverlay').classList.contains('open')) {
+    closeFullscreen();
+  }
+});
+
+// ── DAILY RECAP ──
+function buildRecap() {
+  const card = document.getElementById('recapCard');
+  if (!card) return;
+
+  const todayKey = new Date().toDateString();
+  const dismissed = localStorage.getItem('recap_dismissed');
+  if (dismissed === todayKey) { card.style.display = 'none'; return; }
+
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yStart = new Date(yesterday); yStart.setHours(0,0,0,0);
+  const yEnd   = new Date(yesterday); yEnd.setHours(23,59,59,999);
+
+  const yNotes = notes.filter(n => {
+    const d = new Date(n.created);
+    return d >= yStart && d <= yEnd;
+  });
+
+  const unfinishedTodos = notes.filter(n => {
+    if (n.type !== 'todo') return false;
+    const lines = n.content.split('\n').filter(l => l.trim());
+    return lines.some((_,i) => !n.todoStates[i]);
+  });
+
+  const yDiary = yNotes.filter(n => n.type === 'diary');
+  const yQuick = yNotes.filter(n => n.type === 'quick');
+  const totalYesterday = yNotes.length;
+
+  // Only show if there's something to report
+  if (totalYesterday === 0 && unfinishedTodos.length === 0) {
+    card.style.display = 'none';
+    return;
+  }
+
+  const items = [];
+
+  if (unfinishedTodos.length > 0) {
+    const totalPending = unfinishedTodos.reduce((sum, n) => {
+      const lines = n.content.split('\n').filter(l => l.trim());
+      return sum + lines.filter((_,i) => !n.todoStates[i]).length;
+    }, 0);
+    items.push(`<div class="recap-item"><span class="recap-icon">⏳</span><span>มี To-do ค้างอยู่ <b>${totalPending} ข้อ</b> ใน ${unfinishedTodos.length} รายการ</span></div>`);
+  }
+
+  if (yDiary.length > 0) {
+    items.push(`<div class="recap-item good"><span class="recap-icon">✅</span><span>เขียน diary ไปแล้วเมื่อวาน ${yDiary.length} อัน ดีมาก!</span></div>`);
+  } else {
+    items.push(`<div class="recap-item"><span class="recap-icon">📖</span><span>เมื่อวานยังไม่ได้เขียน diary เลย</span></div>`);
+  }
+
+  if (yQuick.length > 0) {
+    items.push(`<div class="recap-item"><span class="recap-icon">📝</span><span>จดโน้ตไปเมื่อวาน <b>${yQuick.length} อัน</b></span></div>`);
+  }
+
+  const today = new Date().toLocaleDateString('th-TH', { weekday:'long', day:'numeric', month:'long' });
+
+  card.innerHTML = `
+    <div class="recap-card">
+      <div class="recap-title">
+        <span>🌅 สวัสดีตอนเช้า — ${today}</span>
+        <button class="recap-close" onclick="dismissRecap()" title="ปิด">×</button>
+      </div>
+      <div class="recap-items">${items.join('')}</div>
+    </div>`;
+  card.style.display = 'block';
+}
+
+function dismissRecap() {
+  const card = document.getElementById('recapCard');
+  card.style.display = 'none';
+  localStorage.setItem('recap_dismissed', new Date().toDateString());
+}
+
+// ── QUICK CAPTURE ──
+let qcType = 'quick';
+
+function toggleQC() {
+  const fab = document.getElementById('fab');
+  const popup = document.getElementById('qcPopup');
+  const isOpen = popup.classList.contains('open');
+  fab.classList.toggle('open', !isOpen);
+  popup.classList.toggle('open', !isOpen);
+  if (!isOpen) {
+    setTimeout(() => document.getElementById('qcTextarea').focus(), 100);
+  }
+}
+
+function closeQC() {
+  document.getElementById('fab').classList.remove('open');
+  document.getElementById('qcPopup').classList.remove('open');
+}
+
+document.querySelectorAll('.qc-type-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.qc-type-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    qcType = btn.dataset.type;
+    const ph = { todo:'แต่ละบรรทัด = 1 task', diary:'วันนี้เป็นยังไงบ้าง...', quick:'พิมพ์อะไรก็ได้...' };
+    document.getElementById('qcTextarea').placeholder = ph[qcType];
+  });
+});
+
+document.getElementById('qcTextarea').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    saveQC();
+  }
+  if (e.key === 'Escape') closeQC();
+});
+
+function saveQC() {
+  const text = document.getElementById('qcTextarea').value.trim();
+  if (!text) return;
+  const note = { id: Date.now(), type: qcType, content: text, tags: [], created: new Date().toISOString(), pinned: false, todoStates: {} };
+  if (qcType === 'todo') text.split('\n').filter(l => l.trim()).forEach((_, i) => note.todoStates[i] = false);
+  notes.unshift(note);
+  persist();
+  renderNotes();
+  document.getElementById('qcTextarea').value = '';
+  closeQC();
+  showToast('บันทึกแล้ว ✓');
+}
+
+// Close QC when clicking outside
+document.addEventListener('click', e => {
+  if (!e.target.closest('#fab') && !e.target.closest('#qcPopup')) {
+    closeQC();
+  }
+});
+
+renderTemplates();
+buildRecap();
+setupVoice();
+renderNotes();
+
+// ── SERVICE WORKER (PWA) ──
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(() => console.log('SW registered'))
+      .catch(e => console.log('SW error:', e));
+  });
+}
+</script>
+</body>
+</html>
