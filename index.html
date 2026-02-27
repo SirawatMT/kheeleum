@@ -1607,7 +1607,9 @@ renderNotes();
 // ── SERVICE WORKER (PWA) ──
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
+    // Auto-detect base path for GitHub Pages compatibility
+    const swPath = location.pathname.replace(/\/[^/]*$/, '/') + 'sw.js';
+    navigator.serviceWorker.register(swPath)
       .then(() => console.log('SW registered'))
       .catch(e => console.log('SW error:', e));
   });
